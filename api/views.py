@@ -9,13 +9,67 @@ from .models import Company, Favourite, User
 class  UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
 
-    @action(detail=False, methods=['POST'])
-    def register (self,request):
-        response = {'message': 'Register successfully! '}
-        return Response(response, status=status.HTTP_200_OK)
+    # @action(detail=False, methods=['POST'])
+    # def register (self,request):
+    #     if 'email' and 'username' and 'password' in request.data:
+    #         try:
+    #             email = request.data['email']
+    #         except:
+    #             response = {'message': 'Please enter your email address'}
+    #             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    #         try:
+    #             user_name = request.data['username']
+    #         except:
+    #             response = {'message': 'Please enter user name'}
+    #             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    #         try:
+    #             password = request.data['password']
+    #         except:
+    #             response = {'message': 'Please enter password'}
+    #             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    #
+    #
+    #         user = User.objects.create_user(username=user_name,email=email,password=password)
+    #         serializer = UserSerializer(user, many=False)
+    #         response = {'message': 'Register successfully! ','result':serializer.data}
+    #         return Response(response, status=status.HTTP_200_OK)
+    #     else:
+    #         response = {'message' : 'You need to provide username, email and password '}
+    #         return  Response(response,status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, methods=['POST'])
+    def resetpassword (self,request):
+        if 'confirm_password' and 'password' in request.data:
+            try:
+                con_pwd = request.data['confirm_password']
+            except:
+                con_pwd = ' '
+            try:
+                pwd = request.data['password']
+            except:
+                pwd=' '
+            user_name = request.user
+            print(user_name)
+            if con_pwd == pwd:
+
+                try:
+                    user = User.objects.get(username=user_name)
+                    user.set_password(pwd)
+                    user.save()
+                    response = {'message': 'Reset Password successfully! '}
+                    return Response(response, status=status.HTTP_200_OK)
+                except:
+                    response = {'message':'Error occur'}
+                    return  Response(response,status=status.HTTP_400_BAD_REQUEST)
+            else:
+                response = {'message': 'Password and Confirm Password must be the same! '}
+                return Response(response, status=status.HTTP_200_OK)
+        else:
+            response = {'message' : 'You need to provide  password and confirm password '}
+            return  Response(response,status=status.HTTP_400_BAD_REQUEST)
 
 class  CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
