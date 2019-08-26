@@ -92,7 +92,9 @@ class  CompanyViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['GET'])
     def favourite_list(self, request):
         companies = []
-        user = User.objects.get(id=1)
+        username = request.user
+        user = User.objects.get(username=username)
+
         try:
             favourite = Favourite.objects.filter(user=user.id,mark=True)
             for fav in favourite:
