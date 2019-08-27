@@ -77,7 +77,7 @@ class  CompanyViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny,)
 
-    @action(detail=False, methods=['GET'])
+    @action(detail=False, methods=['POST'])
     def search_by_name(self, request):
         if 'name' in request.data:
             name = request.data['name']
@@ -101,7 +101,6 @@ class  CompanyViewSet(viewsets.ModelViewSet):
                 comp = Company.objects.get(id=fav.company.id)
                 companies.append(comp)
             serializer = CompanySerializer(companies, many=True)
-            # serializer = FavouriteSerializer(fav,many=True)
             response = {'message': 'Company By Name ', 'result': serializer.data}
             return Response(response, status=status.HTTP_200_OK)
         except:
